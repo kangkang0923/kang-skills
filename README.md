@@ -1,10 +1,11 @@
 # kang-skills
 
-自研 Agent skills 的产地与成品。三个 skill 共用一套项目文档约定，但职责不同：
+自研 Agent skills 的产地与成品。四个 skill 共用一套项目文档约定，但职责不同：
 
 - `kang-grill`：把目标、约束、取舍和隐含假设问清楚。
 - `kang-decision`：在需求明确后比较可行方案，给出唯一推荐或明确的证据缺口。
 - `kang-docs`：建立并维护 8 文件文档体系，负责初始化、日常整改和存量迁移。
+- `kang-game-design`：游戏 mod 的玩法设计方法论（机制映射、设计查漏、设计债），当前服务于「幻兽帕鲁 → 堆叠大陆」搬运项目。
 
 它们不是必须顺序执行的固定管道。新项目可以先用 `kang-docs` 建立文档骨架，再追问和选型；已有项目也可以只使用其中一个。
 
@@ -17,6 +18,7 @@
 | 想法模糊，想发现遗漏或挑战前提 | `kang-grill` | 「帮我想清楚」「拷打我」「有什么没想到的」 |
 | 技术栈、架构或服务需要拍板 | `kang-decision` | 「用什么技术做」「A 还是 B」「怎么部署」 |
 | 新建、接手、整理或迁移项目文档 | `kang-docs` | 「新建项目」「整理文档」「接手项目」「规范整改」 |
+| 游戏 mod 的玩法/机制设计、映射评审、设计查漏 | `kang-game-design` | 「帮我设计 XX 机制」「这个机制怎么搬进卡牌」 |
 
 不要这样用：
 
@@ -24,6 +26,7 @@
 - 用 `kang-decision` 处理按钮位置、命名等纯偏好问题。
 - 在需求未明时让 `kang-decision` 强行推荐。
 - 让 `kang-docs` 发明需求、设计或业务规则。
+- 用 `kang-game-design` 写实现代码、做技术选型或治理文档体系（各有专责）。
 
 ## 2. 协作流程
 
@@ -34,6 +37,8 @@ kang-grill：事实由 AI 查，决策由用户定
         ↓ 经确认写 REQUIREMENTS / DECISIONS / PLAN
 kang-decision：核实事实 → 比较方案 → 唯一推荐或暂不推荐
         ↓ 用户确认后写 DECISIONS / DESIGN / PLAN
+kang-game-design：玩法/机制设计 → 映射四分法 → 设计查漏与设计债
+        ↓ 用户确认后写 <主题>设计.md / DECISIONS / DESIGN-DEBT
 kang-docs：维护文档权威关系、生命周期和存量迁移
 ```
 
@@ -54,6 +59,7 @@ kang-docs：维护文档权威关系、生命周期和存量迁移
 | `kang-grill` | `REQUIREMENTS.md`（需求经明确确认）、`DECISIONS.md`、`PLAN.md` | `README.md`、`AGENTS.md`、`DESIGN.md`、`MEMORY.md`、`CHANGELOG.md`、实现文件 |
 | `kang-decision` | 选型确认后写 `DECISIONS.md`、`DESIGN.md`、`PLAN.md`；证据不足时只在 `PLAN.md` 记录待验证项 | `REQUIREMENTS.md`、`README.md`、`AGENTS.md`、`MEMORY.md`、`CHANGELOG.md`、实现文件 |
 | `kang-docs` | 全部 8 个文档；其中 `REQUIREMENTS.md` 必须经用户明确确认 | 实现文件；未经确认不得改需求或删除旧文档 |
+| `kang-game-design` | `docs/<主题>设计.md`、`DECISIONS.md`、`PLAN.md`、`DESIGN-DEBT.md`；`REQUIREMENTS.md` 必须经用户明确确认 | `README.md`、`AGENTS.md`、`MEMORY.md`、`CHANGELOG.md`、实现文件；项目内的参考资料（发现勘误只记 PLAN，不擅改） |
 
 补充边界：
 
@@ -107,6 +113,12 @@ skill-production/
     assets/
       program-templates.md
       content-templates.md
+  kang-game-design/
+    SKILL.md
+    references/
+      palworld-quick.md
+      stacklands-language.md
+      checklists.md
 ```
 
 - `SKILL.md`：触发描述与执行流程。
@@ -115,7 +127,7 @@ skill-production/
 
 ## 6. 安装与更新
 
-把三个 `kang-*` 目录完整复制到 Agent 的用户级 skills 目录，**包括 `references/` 和 `assets/`**。
+把四个 `kang-*` 目录完整复制到 Agent 的用户级 skills 目录，**包括 `references/` 和 `assets/`**。
 
 | 工具 | 用户级目标路径 |
 |---|---|
@@ -125,7 +137,7 @@ skill-production/
 安装后检查：
 
 1. 目录名与 frontmatter 中的 `name` 完全一致。
-2. 新会话能看到三个 skill 的触发描述。
+2. 新会话能看到四个 skill 的触发描述。
 3. 旧 `architect`、`grill` 与本套同时启用时可能重复触发；选择一套启用，避免指令竞争。
 4. 更新时同步替换整个对应 skill 目录，避免只更新 `SKILL.md` 而留下旧 references/assets。
 
@@ -149,5 +161,6 @@ skill-production/
 - 改提问规则：同步 `kang-grill`、`kang-decision` 和 `questionnaire.md`，保持「最多 5 个互不依赖的问题」一致。
 - 改读写权限：同步三个 `SKILL.md` 与本 README 的权限矩阵，避免一处放开、另一处仍禁止。
 - Markdown 中的路径统一使用 `/`，不要写入本机绝对路径。
-- 三个 skill 都是纯 Markdown，无脚本依赖；可移植性仍取决于目标 Agent 的 skill 加载规则。
+- 改游戏设计口径：帕鲁事实只认项目 `docs/` 下 6 份参考文档（玩法清单/数据表/收录名单/材料/料理/设施），`kang-game-design/references/palworld-quick.md` 只做索引，不复制数值。
+- 四个 skill 都是纯 Markdown，无脚本依赖；可移植性仍取决于目标 Agent 的 skill 加载规则。
 - 重要设计变化应记录到开发工作区的决策文件；记录理由，不复制规范正文。
